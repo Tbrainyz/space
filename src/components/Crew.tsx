@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
 import Navbar from "../components/Navbar";
 
 import crewImage1 from "../assets/crew/image-douglas-hurley.png";
@@ -48,81 +50,156 @@ type Direction = "left" | "right";
 const Crew = () => {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<Direction>("right");
-  const [animating, setAnimating] = useState(true);
 
   const changeCrew = (newIndex: number) => {
     setDirection(newIndex > index ? "right" : "left");
-    setAnimating(false);
-
-    setTimeout(() => {
-      setIndex(newIndex);
-      setAnimating(true);
-    }, 200);
+    setIndex(newIndex);
   };
 
   const crew = crews[index];
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 overflow-hidden"
+    <motion.div
+      initial={{ opacity: 0, scale: 1.02 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.7, ease: "easeInOut" }}
+      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 overflow-hidden relative"
       style={{ backgroundImage: `url(${desktopBG})` }}
     >
-      <Navbar />
+      {/* DARK OVERLAY */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
 
-      <section className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-6">
-        <div
-          className={`text-center lg:text-left max-w-xl transition-all duration-500 ${
-            animating
-              ? "opacity-100 translate-x-0"
-              : direction === "right"
-                ? "opacity-0 -translate-x-16"
-                : "opacity-0 translate-x-16"
-          }`}
-        >
-          <h3 className="uppercase text-gray-400 text-2xl md:text-3xl mb-4">
-            {crew.role}
-          </h3>
+      <div className="relative z-10">
+        <Navbar />
 
-          <h1 className="uppercase text-5xl md:text-6xl lg:text-7xl mb-6">
-            {crew.name}
-          </h1>
+        {/* TITLE */}
+        <div className="mt-10">
+          <h2 className="uppercase tracking-[4px] text-lg md:text-2xl text-center lg:text-left">
+            <span className="text-gray-500 mr-4">02</span>
+            Meet your crew
+          </h2>
+        </div>
 
-          <p className="text-gray-300 leading-8 text-sm md:text-base">
-            {crew.description}
-          </p>
+        <section className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-10">
+          {/* TEXT SECTION */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={crew.name}
+              initial={{
+                opacity: 0,
+                x: direction === "right" ? 80 : -80,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+              }}
+              exit={{
+                opacity: 0,
+                x: direction === "right" ? -80 : 80,
+              }}
+              transition={{
+                duration: 0.6,
+                ease: "easeInOut",
+              }}
+              className="text-center lg:text-left max-w-xl"
+            >
+              <motion.h3
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="uppercase text-gray-400 text-2xl md:text-3xl mb-4"
+              >
+                {crew.role}
+              </motion.h3>
 
-          <div className="flex gap-4 justify-center lg:justify-start mt-10">
-            {crews.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => changeCrew(i)}
-                className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                  index === i
-                    ? "bg-white scale-150"
-                    : "bg-white/30 hover:bg-white/70"
-                }`}
+              <motion.h1
+                initial={{ opacity: 0, letterSpacing: "10px" }}
+                animate={{ opacity: 1, letterSpacing: "0px" }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="uppercase text-5xl md:text-6xl lg:text-7xl mb-6 font-light"
+              >
+                {crew.name}
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-gray-300 leading-8 text-sm md:text-base max-w-lg"
+              >
+                {crew.description}
+              </motion.p>
+
+              {/* DOTS */}
+              <div className="flex gap-5 justify-center lg:justify-start mt-10">
+                {crews.map((_, i) => (
+                  <motion.button
+                    key={i}
+                    whileHover={{ scale: 1.4 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => changeCrew(i)}
+                    className={`relative w-4 h-4 rounded-full transition-all duration-300 ${
+                      index === i
+                        ? "bg-white scale-150"
+                        : "bg-white/30 hover:bg-white/70"
+                    }`}
+                  >
+                    {index === i && (
+                      <motion.span
+                        layoutId="crewIndicator"
+                        className="absolute inset-0 rounded-full bg-white"
+                      />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* IMAGE SECTION */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={crew.image}
+              initial={{
+                opacity: 0,
+                scale: 0.8,
+                x: direction === "right" ? 100 : -100,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                x: 0,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.8,
+                x: direction === "right" ? -100 : 100,
+              }}
+              transition={{
+                duration: 0.7,
+                ease: "easeInOut",
+              }}
+              className="flex justify-center"
+            >
+              <motion.img
+                animate={{
+                  y: [0, -12, 0],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                src={crew.image}
+                alt={crew.name}
+                className="h-[320px] md:h-[420px] lg:h-[560px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.15)]"
               />
-            ))}
-          </div>
-        </div>
-
-        <div
-          className={`flex justify-center transition-all duration-500 ${
-            animating
-              ? "opacity-100 translate-x-0"
-              : direction === "right"
-                ? "opacity-0 translate-x-20"
-                : "opacity-0 -translate-x-20"
-          }`}
-        >
-          <img
-            src={crew.image}
-            alt={crew.name}
-            className="h-[320px] md:h-[420px] lg:h-[500px] object-contain"
-          />
-        </div>
-      </section>
-    </div>
+            </motion.div>
+          </AnimatePresence>
+        </section>
+      </div>
+    </motion.div>
   );
 };
 

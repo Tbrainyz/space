@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
 import Navbar from "../components/Navbar";
 
 import moonImage from "../assets/destination/image-moon.png";
@@ -42,105 +44,192 @@ const destinations = [
   },
 ];
 
-// ONLY ADD TYPE (no logic change)
 type DestinationType = (typeof destinations)[number];
 
 const Destination = () => {
   const [active, setActive] = useState(destinations[0]);
-  const [animate, setAnimate] = useState(true);
 
   const changePlanet = (planet: DestinationType) => {
-    setAnimate(false);
-
-    setTimeout(() => {
-      setActive(planet);
-      setAnimate(true);
-    }, 220);
+    setActive(planet);
   };
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 pb-32"
+    <motion.div
+      initial={{ opacity: 0, scale: 1.02 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.7, ease: "easeInOut" }}
+      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 pb-32 overflow-hidden relative"
       style={{ backgroundImage: `url(${desktopBG})` }}
     >
-      <Navbar />
+      {/* OVERLAY */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
 
-      <div className="mt-10 flex">
-        <h2 className="uppercase tracking-[4px] text-xl">
-          <span className="text-gray-500 mr-4">01</span>
-          Pick your destination
-        </h2>
-      </div>
+      <div className="relative z-10">
+        <Navbar />
 
-      <section className="flex flex-col lg:flex-row items-center justify-between gap-20 pt-16">
-        {/* IMAGE */}
-        <div
-          className={`flex justify-center transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-            animate
-              ? "opacity-100 scale-100 translate-y-0 rotate-0"
-              : "opacity-0 scale-75 translate-y-10 rotate-6"
-          }`}
+        {/* TITLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mt-10 flex"
         >
-          <img
-            src={active.image}
-            alt={active.name}
-            className="w-52 md:w-72 lg:w-[400px] transition-transform duration-500 hover:scale-110"
-          />
-        </div>
+          <h2 className="uppercase tracking-[4px] text-xl md:text-2xl">
+            <span className="text-gray-500 mr-4">01</span>
+            Pick your destination
+          </h2>
+        </motion.div>
 
-        {/* TEXT */}
-        <div
-          className={`max-w-xl text-center lg:text-left transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-            animate
-              ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 translate-y-10 scale-90"
-          }`}
-        >
-          {/* TABS */}
-          <div className="flex gap-8 justify-center lg:justify-start uppercase tracking-[2px] text-gray-300 mb-10">
-            {destinations.map((planet) => (
-              <button
-                key={planet.name}
-                onClick={() => changePlanet(planet)}
-                className={`relative group transition-all duration-300 ${
-                  active.name === planet.name
-                    ? "text-white scale-110"
-                    : "text-gray-400 hover:text-white"
-                }`}
+        <section className="flex flex-col lg:flex-row items-center justify-between gap-20 pt-16">
+          {/* PLANET IMAGE */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active.name}
+              initial={{
+                opacity: 0,
+                scale: 0.7,
+                rotate: -20,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                rotate: 0,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.7,
+                rotate: 20,
+              }}
+              transition={{
+                duration: 0.7,
+                ease: "easeInOut",
+              }}
+              className="flex justify-center"
+            >
+              <motion.img
+                animate={{
+                  rotate: 360,
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  rotate: {
+                    duration: 40,
+                    repeat: Infinity,
+                    ease: "linear",
+                  },
+                  y: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  },
+                }}
+                src={active.image}
+                alt={active.name}
+                className="w-52 md:w-72 lg:w-[420px] drop-shadow-[0_0_50px_rgba(255,255,255,0.2)]"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* TEXT SECTION */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active.name + "-text"}
+              initial={{
+                opacity: 0,
+                x: 80,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+              }}
+              exit={{
+                opacity: 0,
+                x: -80,
+              }}
+              transition={{
+                duration: 0.6,
+              }}
+              className="max-w-xl text-center lg:text-left"
+            >
+              {/* TABS */}
+              <div className="flex gap-8 justify-center lg:justify-start uppercase tracking-[2px] text-gray-300 mb-10">
+                {destinations.map((planet) => (
+                  <motion.button
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
+                    key={planet.name}
+                    onClick={() => changePlanet(planet)}
+                    className={`relative pb-2 transition-all duration-300 ${
+                      active.name === planet.name
+                        ? "text-white"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    {planet.name}
+
+                    {active.name === planet.name && (
+                      <motion.span
+                        layoutId="planetUnderline"
+                        className="absolute left-0 bottom-0 w-full h-[2px] bg-white"
+                      />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* NAME */}
+              <motion.h1
+                initial={{ opacity: 0, letterSpacing: "15px" }}
+                animate={{ opacity: 1, letterSpacing: "0px" }}
+                transition={{ duration: 0.8 }}
+                className="text-6xl md:text-7xl lg:text-8xl uppercase mb-6"
               >
-                {planet.name}
+                {active.name}
+              </motion.h1>
 
-                <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+              {/* DESCRIPTION */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-gray-300 leading-8 border-b border-white/20 pb-10 text-sm md:text-base"
+              >
+                {active.description}
+              </motion.p>
 
-                {active.name === planet.name && (
-                  <span className="absolute left-0 -bottom-1 w-full h-[2px] bg-white"></span>
-                )}
-              </button>
-            ))}
-          </div>
+              {/* STATS */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-col md:flex-row gap-10 pt-8"
+              >
+                <div>
+                  <p className="text-gray-400 uppercase text-sm tracking-[2px]">
+                    Avg. Distance
+                  </p>
 
-          <h1 className="text-6xl md:text-7xl uppercase mb-6">{active.name}</h1>
+                  <h3 className="text-2xl md:text-3xl uppercase mt-2">
+                    {active.distance}
+                  </h3>
+                </div>
 
-          <p className="text-gray-300 leading-8 border-b border-white/20 pb-10">
-            {active.description}
-          </p>
+                <div>
+                  <p className="text-gray-400 uppercase text-sm tracking-[2px]">
+                    Est. Travel Time
+                  </p>
 
-          <div className="flex flex-col md:flex-row gap-10 pt-8">
-            <div>
-              <p className="text-gray-400 uppercase text-sm">Avg. Distance</p>
-              <h3 className="text-2xl uppercase">{active.distance}</h3>
-            </div>
-
-            <div>
-              <p className="text-gray-400 uppercase text-sm">
-                Est. Travel Time
-              </p>
-              <h3 className="text-2xl uppercase">{active.travel}</h3>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+                  <h3 className="text-2xl md:text-3xl uppercase mt-2">
+                    {active.travel}
+                  </h3>
+                </div>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        </section>
+      </div>
+    </motion.div>
   );
 };
 

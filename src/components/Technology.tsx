@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
 import Navbar from "../components/Navbar";
 
 import techImage1 from "../assets/technology/image-launch-vehicle-landscape.jpg";
@@ -41,92 +43,163 @@ const technologies: TechType[] = [
 const Technology = () => {
   const [index, setIndex] = useState<number>(0);
   const [direction, setDirection] = useState<Direction>("right");
-  const [animating, setAnimating] = useState<boolean>(true);
 
   const changeTech = (newIndex: number) => {
     setDirection(newIndex > index ? "right" : "left");
-    setAnimating(false);
-
-    setTimeout(() => {
-      setIndex(newIndex);
-      setAnimating(true);
-    }, 220);
+    setIndex(newIndex);
   };
 
   const tech = technologies[index];
 
   return (
-    <div
-      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 overflow-hidden"
+    <motion.div
+      initial={{ opacity: 0, scale: 1.02 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.7, ease: "easeInOut" }}
+      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 overflow-hidden relative"
       style={{ backgroundImage: `url(${desktopBG})` }}
     >
-      <Navbar />
+      {/* OVERLAY */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" />
 
-      {/* TITLE */}
-      <div className="mt-10 text-center lg:text-left">
-        <h2 className="uppercase tracking-[4px] text-lg md:text-2xl">
-          <span className="text-gray-500 mr-4">03</span>
-          Space Launch 101
-        </h2>
-      </div>
+      <div className="relative z-10">
+        <Navbar />
 
-      <section className="flex flex-col lg:flex-row items-center justify-between gap-16 pt-16">
-        {/* BUTTONS */}
-        <div className="flex lg:flex-col gap-4">
-          {technologies.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => changeTech(i)}
-              className={`w-12 h-12 md:w-16 md:h-16 rounded-full border transition-all duration-300 ${
-                index === i
-                  ? "bg-white text-black scale-110"
-                  : "hover:bg-white/20 hover:scale-105"
-              }`}
+        {/* TITLE */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mt-10 text-center lg:text-left"
+        >
+          <h2 className="uppercase tracking-[4px] text-lg md:text-2xl">
+            <span className="text-gray-500 mr-4">03</span>
+            Space Launch 101
+          </h2>
+        </motion.div>
+
+        <section className="flex flex-col lg:flex-row items-center justify-between gap-16 pt-16">
+          {/* BUTTONS */}
+          <div className="flex lg:flex-col gap-5">
+            {technologies.map((_, i) => (
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                key={i}
+                onClick={() => changeTech(i)}
+                className={`relative w-12 h-12 md:w-16 md:h-16 rounded-full border transition-all duration-300 text-lg ${
+                  index === i
+                    ? "bg-white text-black border-white"
+                    : "border-white/40 hover:bg-white/20 hover:border-white"
+                }`}
+              >
+                {i + 1}
+
+                {index === i && (
+                  <motion.span
+                    layoutId="techIndicator"
+                    className="absolute inset-0 rounded-full border-2 border-white"
+                  />
+                )}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* TEXT */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tech.name}
+              initial={{
+                opacity: 0,
+                x: direction === "right" ? 80 : -80,
+              }}
+              animate={{
+                opacity: 1,
+                x: 0,
+              }}
+              exit={{
+                opacity: 0,
+                x: direction === "right" ? -80 : 80,
+              }}
+              transition={{
+                duration: 0.6,
+                ease: "easeInOut",
+              }}
+              className="max-w-xl text-center lg:text-left"
             >
-              {i + 1}
-            </button>
-          ))}
-        </div>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="uppercase text-gray-400 tracking-[3px] mb-4"
+              >
+                The terminology...
+              </motion.p>
 
-        {/* TEXT */}
-        <div
-          className={`max-w-xl transition-all duration-500 ${
-            animating
-              ? "opacity-100 translate-x-0"
-              : direction === "right"
-                ? "opacity-0 -translate-x-16"
-                : "opacity-0 translate-x-16"
-          }`}
-        >
-          <p className="uppercase text-gray-400 tracking-[2px] mb-4">
-            The terminology...
-          </p>
+              <motion.h1
+                initial={{ opacity: 0, letterSpacing: "10px" }}
+                animate={{ opacity: 1, letterSpacing: "0px" }}
+                transition={{ duration: 0.8 }}
+                className="uppercase text-4xl md:text-5xl lg:text-6xl mb-6"
+              >
+                {tech.name}
+              </motion.h1>
 
-          <h1 className="uppercase text-4xl md:text-5xl lg:text-6xl mb-6">
-            {tech.name}
-          </h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="text-gray-300 leading-8 text-sm md:text-base"
+              >
+                {tech.description}
+              </motion.p>
+            </motion.div>
+          </AnimatePresence>
 
-          <p className="text-gray-300 leading-8">{tech.description}</p>
-        </div>
-
-        {/* IMAGE */}
-        <div
-          className={`flex justify-center transition-all duration-500 ${
-            animating
-              ? "opacity-100 translate-x-0"
-              : direction === "right"
-                ? "opacity-0 translate-x-20"
-                : "opacity-0 -translate-x-20"
-          }`}
-        >
-          <img
-            src={tech.image}
-            alt={tech.name}
-            className="w-full max-w-[500px] rounded-lg hover:scale-105 transition-transform duration-500"
-          />
-        </div>
-      </section>
-    </div>
+          {/* IMAGE */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tech.image}
+              initial={{
+                opacity: 0,
+                scale: 0.8,
+                x: direction === "right" ? 120 : -120,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                x: 0,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.8,
+                x: direction === "right" ? -120 : 120,
+              }}
+              transition={{
+                duration: 0.7,
+                ease: "easeInOut",
+              }}
+              className="flex justify-center"
+            >
+              <motion.img
+                animate={{
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                src={tech.image}
+                alt={tech.name}
+                className="w-full max-w-[550px] rounded-2xl shadow-[0_0_50px_rgba(255,255,255,0.12)]"
+              />
+            </motion.div>
+          </AnimatePresence>
+        </section>
+      </div>
+    </motion.div>
   );
 };
 
