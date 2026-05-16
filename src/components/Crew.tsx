@@ -64,7 +64,7 @@ const Crew = () => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.7, ease: "easeInOut" }}
-      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 overflow-hidden relative"
+      className="min-h-screen bg-cover bg-center text-white px-6 md:px-10 lg:px-20 overflow-x-hidden relative"
       style={{ backgroundImage: `url(${desktopBG})` }}
     >
       {/* DARK OVERLAY */}
@@ -81,14 +81,14 @@ const Crew = () => {
           </h2>
         </div>
 
-        <section className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-10">
+        <section className="flex flex-col lg:flex-row items-center justify-between gap-12 pt-10 min-h-[80vh]">
           {/* TEXT SECTION */}
           <AnimatePresence mode="wait">
             <motion.div
               key={crew.name}
               initial={{
                 opacity: 0,
-                x: direction === "right" ? 80 : -80,
+                x: direction === "right" ? 40 : -40,
               }}
               animate={{
                 opacity: 1,
@@ -96,13 +96,13 @@ const Crew = () => {
               }}
               exit={{
                 opacity: 0,
-                x: direction === "right" ? -80 : 80,
+                x: direction === "right" ? -40 : 40,
               }}
               transition={{
                 duration: 0.6,
                 ease: "easeInOut",
               }}
-              className="text-center lg:text-left max-w-xl"
+              className="text-center lg:text-left max-w-xl w-full"
             >
               <motion.h3
                 initial={{ opacity: 0, y: 20 }}
@@ -136,7 +136,7 @@ const Crew = () => {
                 {crews.map((_, i) => (
                   <motion.button
                     key={i}
-                    whileHover={{ scale: 1.4 }}
+                    whileHover={{ scale: 1.3 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => changeCrew(i)}
                     className={`relative w-4 h-4 rounded-full transition-all duration-300 ${
@@ -144,14 +144,7 @@ const Crew = () => {
                         ? "bg-white scale-150"
                         : "bg-white/30 hover:bg-white/70"
                     }`}
-                  >
-                    {index === i && (
-                      <motion.span
-                        layoutId="crewIndicator"
-                        className="absolute inset-0 rounded-full bg-white"
-                      />
-                    )}
-                  </motion.button>
+                  />
                 ))}
               </div>
             </motion.div>
@@ -164,7 +157,7 @@ const Crew = () => {
               initial={{
                 opacity: 0,
                 scale: 0.8,
-                x: direction === "right" ? 100 : -100,
+                x: direction === "right" ? 60 : -60,
               }}
               animate={{
                 opacity: 1,
@@ -174,17 +167,17 @@ const Crew = () => {
               exit={{
                 opacity: 0,
                 scale: 0.8,
-                x: direction === "right" ? -100 : 100,
+                x: direction === "right" ? -60 : 60,
               }}
               transition={{
                 duration: 0.7,
                 ease: "easeInOut",
               }}
-              className="flex justify-center"
+              className="flex justify-center w-full lg:w-auto"
             >
               <motion.img
                 animate={{
-                  y: [0, -12, 0],
+                  y: [0, -10, 0],
                 }}
                 transition={{
                   duration: 4,
@@ -193,7 +186,7 @@ const Crew = () => {
                 }}
                 src={crew.image}
                 alt={crew.name}
-                className="h-[320px] md:h-[420px] lg:h-[560px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+                className="h-[260px] sm:h-[300px] md:h-[420px] lg:h-[560px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.15)]"
               />
             </motion.div>
           </AnimatePresence>
